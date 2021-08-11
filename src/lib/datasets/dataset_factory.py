@@ -14,27 +14,30 @@ from .dataset.oversea import oversea
 from .dataset.photo_qieti import photo_qieti
 from .dataset.photo_qieti_zhiyun import photo_qieti_zhiyun
 from .dataset.bbk_formula import bbk_formula
-
+from .dataset.sogou import sogou
+from .dataset.sogou_clear import sogou_clear
 
 dataset_factory = {
-  'qieti_tigan': qieti_tigan,
-  'oversea': oversea,
-  'photo_qieti': photo_qieti,
-  'photo_qieti_zhiyun': photo_qieti_zhiyun,
-  'bbk_formula': bbk_formula,
+    'qieti_tigan': qieti_tigan,
+    'oversea': oversea,
+    'photo_qieti': photo_qieti,
+    'photo_qieti_zhiyun': photo_qieti_zhiyun,
+    'bbk_formula': bbk_formula,
+    'sogou': sogou,
+    'sogou_clear': sogou_clear
 }
 
 _sample_factory = {
-  'exdet': EXDetDataset,
-  'ctdet': CTDetDataset,
-  'ddd': DddDataset,
-  'multi_pose': MultiPoseDataset,
-  'ctseg':CTSegDataset,
+    'exdet': EXDetDataset,
+    'ctdet': CTDetDataset,
+    'ddd': DddDataset,
+    'multi_pose': MultiPoseDataset,
+    'ctseg': CTSegDataset,
 }
 
 
 def get_dataset(dataset, task):
-  class Dataset(dataset_factory[dataset], _sample_factory[task]):
-    pass
-  return Dataset
-  
+    class Dataset(dataset_factory[dataset], _sample_factory[task]):
+        pass
+
+    return Dataset

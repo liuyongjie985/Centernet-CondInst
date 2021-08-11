@@ -7,7 +7,8 @@ import numpy as np
 from progress.bar import Bar
 import time
 import torch
-from pycocotools import  mask as mask_utils
+from pycocotools import mask as mask_utils
+
 try:
     from external.nms import soft_nms
 except:
@@ -34,38 +35,38 @@ class CtsegDetector(BaseDetector):
             seg_feat = output['seg_feat']
             conv_weigt = output['conv_weight']
             reg = output['reg'] if self.opt.reg_offset else None
-            assert not self.opt.flip_test,"not support flip_test"
+            assert not self.opt.flip_test, "not support flip_test"
             torch.cuda.synchronize()
             forward_time = time.time()
-            dets,masks = ctseg_decode(hm, wh,seg_feat, conv_weigt, reg=reg, cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
+            dets, masks = ctseg_decode(hm, wh, seg_feat, conv_weigt, reg=reg, cat_spec_wh=self.opt.cat_spec_wh,
+                                       K=self.opt.K)
 
         if return_time:
-            return output, (dets,masks), forward_time
+            return output, (dets, masks), forward_time
         else:
-            return output, (dets,masks)
+            return output, (dets, masks)
 
     def post_process(self, det_seg, meta, scale=1):
         assert scale == 1, "not support scale != 1"
-        dets,seg = det_seg
+        dets, seg = det_seg
         dets = dets.detach().cpu().numpy()
         seg = seg.detach().cpu().numpy()
         dets = dets.reshape(1, -1, dets.shape[2])
         dets = ctseg_post_process(
-            dets.copy(),seg.copy(), [meta['c']], [meta['s']],
-            meta['out_height'], meta['out_width'],*meta['img_size'], self.opt.num_classes)
+            dets.copy(), seg.copy(), [meta['c']], [meta['s']],
+            meta['out_height'], meta['out_width'], *meta['img_size'], self.opt.num_classes)
         return dets[0]
 
     def merge_outputs(self, detections):
         return detections[0]
 
-
     def show_results(self, debugger, image, results):
         debugger.add_img(image, img_id='ctseg')
         for j in range(1, self.num_classes + 1):
             for i in range(len(results[j]['boxs'])):
-                bbox=results[j]['boxs'][i]
+                bbox = results[j]['boxs'][i]
                 mask = mask_utils.decode(results[j]['pred_mask'][i])
                 if bbox[4] > self.opt.vis_thresh:
                     debugger.add_coco_bbox(bbox[:4], j - 1, bbox[4], img_id='ctseg')
-                    debugger.add_coco_seg(mask,img_id='ctseg')
+                    debugger.add_coco_seg(mask, img_id='ctseg')
         debugger.show_all_imgs(pause=self.pause)

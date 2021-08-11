@@ -91,7 +91,7 @@ class CTSegDataset(data.Dataset):
         reg_mask = np.zeros((self.max_objs), dtype=np.uint8)
         cat_spec_wh = np.zeros((self.max_objs, num_classes * 2), dtype=np.float32)
         cat_spec_mask = np.zeros((self.max_objs, num_classes * 2), dtype=np.uint8)
-        instance_masks = np.zeros((num_objs if num_objs > 0 else 1,output_h,output_w),dtype=np.float32)
+        instance_masks = np.zeros((num_objs if num_objs > 0 else 1, output_h, output_w), dtype=np.float32)
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else \
             draw_umich_gaussian
 
@@ -111,9 +111,9 @@ class CTSegDataset(data.Dataset):
             bbox[2:] = affine_transform(bbox[2:], trans_output)
             bbox[[0, 2]] = np.clip(bbox[[0, 2]], 0, output_w - 1)
             bbox[[1, 3]] = np.clip(bbox[[1, 3]], 0, output_h - 1)
-            instance_mask= cv2.warpAffine(instance_mask, trans_output,
-                                 (output_w, output_h),
-                                 flags=cv2.INTER_LINEAR)
+            instance_mask = cv2.warpAffine(instance_mask, trans_output,
+                                           (output_w, output_h),
+                                           flags=cv2.INTER_LINEAR)
             instance_mask = instance_mask.astype(np.float32)
 
             h, w = bbox[3] - bbox[1], bbox[2] - bbox[0]
@@ -138,7 +138,7 @@ class CTSegDataset(data.Dataset):
                                ct[0] + w / 2, ct[1] + h / 2, 1, cls_id])
 
         ret = {'input': inp, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh,
-               "instance_mask":instance_masks}
+               "instance_mask": instance_masks}
         if self.opt.dense_wh:
             hm_a = hm.max(axis=0, keepdims=True)
             dense_wh_mask = np.concatenate([hm_a, hm_a], axis=0)

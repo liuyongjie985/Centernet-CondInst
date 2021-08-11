@@ -11,22 +11,22 @@ import os
 import torch.utils.data as data
 
 
-class photo_qieti_zhiyun(data.Dataset):
+class sogou_clear(data.Dataset):
     num_classes = 2
-    default_resolution = [768, 768]
+    default_resolution = [512, 512]
     mean = np.array([0.40789654, 0.44719302, 0.47026115],
                     dtype=np.float32).reshape(1, 1, 3)
     std = np.array([0.28863828, 0.27408164, 0.27809835],
                    dtype=np.float32).reshape(1, 1, 3)
 
     def __init__(self, opt, split):
-        super(photo_qieti_zhiyun, self).__init__()
-        self.data_dir = os.path.join(opt.data_dir, 'photo_qieti_zhiyun')
+        super(sogou_clear, self).__init__()
+        self.data_dir = os.path.join(opt.data_dir, 'sogou_clear')
         self.img_dir = os.path.join(self.data_dir, split)
         self.annot_path = os.path.join(
             self.data_dir, 'annotations', 'instances_%s.json' % split)
         self.max_objs = 128
-        self.class_name = ['__background__', 'tigan', 'peitu']
+        self.class_name = ['__background__', 'embedded', 'isolated']
         self._valid_ids = [1, 2]
         self.cat_ids = {v: i for i, v in enumerate(self._valid_ids)}
         self.voc_color = [(v // 32 * 64 + 64, (v // 8) % 4 * 64, v % 8 * 32) \
@@ -45,7 +45,7 @@ class photo_qieti_zhiyun(data.Dataset):
         self.split = split
         self.opt = opt
 
-        print('==> initializing Photo_Qieti {} data.'.format(split))
+        print('==> initializing sogou {} data.'.format(split))
         self.coco = coco.COCO(self.annot_path)
         self.images = self.coco.getImgIds()
         self.num_samples = len(self.images)
